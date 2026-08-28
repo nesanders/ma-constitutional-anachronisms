@@ -1,4 +1,4 @@
-# Reading the MA Constitution
+# Anachronisms in the Massachusetts Constitution
 
 A single-page interactive that highlights six passages in the Massachusetts
 Constitution a modern reader might flag as anachronistic, exclusionary, or
