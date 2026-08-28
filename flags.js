@@ -47,19 +47,29 @@ const FLAGS = [
   },
   {
     id: "c3",
-    location: "Part the Second, Chapter V, Section I, Articles I & III",
+    location: "Part the Second, Chapter V, Section I, Article I",
     anchorId: "chapterVArticleI",
-    extraAnchorIds: ["chapterVArticleIII"],
-    shortLabel: "Chapter V — Harvard governance clause",
-    quote: "our wise and pious ancestors … the ministers of the congregational churches",
+    shortLabel: "Harvard's charter, framed as providence",
+    quote: "our wise and pious ancestors … by the blessing of God",
     context:
-      "Chapter V praises Harvard's 'wise and pious ancestors' and names the Governor, Council, and Senate as successors to a 1642 board that included 'ministers of the congregational churches' from six towns — clergy written into public university governance.",
+      "Article I confirms Harvard College's corporate privileges and franchises 'forever,' crediting a private university's protected status to 'wise and pious ancestors' and 'the blessing of God' rather than ordinary public policy.",
+    status: "Still in force, never amended.",
+    stillInForce: true,
+  },
+  {
+    id: "c4",
+    location: "Part the Second, Chapter V, Section I, Article III",
+    anchorId: "chapterVArticleIII",
+    shortLabel: "Ministers written into Harvard's governance",
+    quote: "the ministers of the congregational churches … vested with all the powers … of the overseers",
+    context:
+      "Article III names the Governor, Council, and Senate, together with 'the ministers of the congregational churches' of six towns, as successors to Harvard's 1642 overseer board — clergy of one denomination holding a constitutional governance role.",
     status:
       "Still in the text; legislature has statutory authority to alter it, but it has not been constitutionally amended out.",
     stillInForce: true,
   },
   {
-    id: "c4",
+    id: "c5",
     location: "Part the Second, Chapter II (representative instances)",
     anchorId: "chapterIISectionIArticleII",
     extraAnchorIds: ["chapterIISectionIIArticleI", "chapterIISectionIIIArticleI"],
@@ -71,7 +81,7 @@ const FLAGS = [
     stillInForce: true,
   },
   {
-    id: "c5",
+    id: "c6",
     location: "Part the First, Article I",
     anchorId: "articleI",
     extraAnchorIds: ["amendmentArticleCVI"],
