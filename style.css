@@ -1,7 +1,8 @@
 :root {
-  --accent: #b5501f;
-  --accent-soft: #f4e3d3;
-  --accent-soft-border: #e0b98d;
+  --accent: #132450;
+  --accent-soft: #e2e9f2;
+  --accent-soft-border: #9fb0cc;
+  --link: #0d32b6;
   --ink: #1c1a17;
   --ink-muted: #55524c;
   --paper: #fdfbf7;
@@ -9,8 +10,8 @@
   --text-panel-bg: #f7f5f0;
   --text-panel-border: #e3ded2;
   --line: #ddd8cc;
-  --note-color: #8a6a4a;
-  --focus-ring: #2f6fb0;
+  --note-color: #4e5b7c;
+  --focus-ring: #0d32b6;
   --sans: "Helvetica Neue", Arial, "Segoe UI", sans-serif;
   --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
 }
@@ -32,7 +33,7 @@ body {
 }
 
 a {
-  color: var(--accent);
+  color: var(--link);
 }
 
 /* ---------- Header ---------- */
@@ -54,6 +55,7 @@ header.site-header {
   font-size: clamp(1.5rem, 2.4vw, 2.1rem);
   font-weight: 700;
   letter-spacing: -0.01em;
+  color: var(--accent);
 }
 
 .site-header p.dek {
@@ -160,20 +162,20 @@ header.site-header {
   }
 }
 
-/* ---------- Concerns rail (the loud, primary surface) ---------- */
+/* ---------- Flags rail (the loud, primary surface) ---------- */
 
-.concerns-rail {
+.flags-rail {
   position: sticky;
   top: 0;
 }
 
 @media (max-width: 900px) {
-  .concerns-rail {
+  .flags-rail {
     position: static;
   }
 }
 
-.concerns-rail h2.rail-title {
+.flags-rail h2.rail-title {
   font-family: var(--sans);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -183,7 +185,7 @@ header.site-header {
   margin: 0 0 0.75rem;
 }
 
-.concern-list {
+.flag-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -193,13 +195,13 @@ header.site-header {
 }
 
 @media (max-width: 900px) {
-  .concern-list {
+  .flag-list {
     max-height: none;
     overflow-y: visible;
   }
 }
 
-.concern-card {
+.flag-card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-left: 6px solid var(--accent);
@@ -210,22 +212,22 @@ header.site-header {
   scroll-margin-top: 1rem;
 }
 
-.concern-card:hover {
+.flag-card:hover {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
-.concern-card.is-active {
+.flag-card.is-active {
   background: var(--accent-soft);
   border-left-color: var(--accent);
-  box-shadow: 0 4px 14px rgba(181, 80, 31, 0.18);
+  box-shadow: 0 4px 14px rgba(19, 36, 80, 0.18);
 }
 
-.concern-card:focus-visible {
+.flag-card:focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-.concern-card .card-top {
+.flag-card .card-top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -233,27 +235,27 @@ header.site-header {
   margin-bottom: 0.35rem;
 }
 
-.concern-card .card-index {
+.flag-card .card-index {
   font-size: 0.72rem;
   color: var(--ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.concern-card h3 {
+.flag-card h3 {
   margin: 0 0 0.15rem;
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--ink);
 }
 
-.concern-card .location {
+.flag-card .location {
   font-size: 0.78rem;
   color: var(--ink-muted);
   margin-bottom: 0.55rem;
 }
 
-.concern-card blockquote {
+.flag-card blockquote {
   margin: 0 0 0.6rem;
   padding-left: 0.7rem;
   border-left: 2px solid var(--accent-soft-border);
@@ -263,7 +265,7 @@ header.site-header {
   font-size: 0.95rem;
 }
 
-.concern-card .context {
+.flag-card .context {
   font-size: 0.92rem;
   color: var(--ink);
   margin: 0 0 0.7rem;
@@ -278,8 +280,8 @@ header.site-header {
 }
 
 .status-chip.in-force {
-  background: #fde8dc;
-  color: #8a3512;
+  background: #dce4f2;
+  color: #132450;
 }
 
 .status-chip.amended {
@@ -321,7 +323,7 @@ header.site-header {
   display: block;
 }
 
-.inline-clause-disclosure mark.concern-mark {
+.inline-clause-disclosure mark.flag-mark {
   background: var(--accent-soft);
   color: var(--ink);
 }
@@ -371,7 +373,7 @@ header.site-header {
 #fulltext h2 {
   font-size: 1.3rem;
   margin-top: 2.5rem;
-  color: var(--ink);
+  color: var(--accent);
   border-bottom: 1px solid var(--text-panel-border);
   padding-bottom: 0.3rem;
 }
@@ -409,7 +411,7 @@ header.site-header {
   font-weight: 600;
 }
 
-#fulltext mark.concern-mark {
+#fulltext mark.flag-mark {
   background: transparent;
   color: inherit;
   padding: 0 0.05em;
@@ -418,7 +420,7 @@ header.site-header {
   transition: background-color 0.2s ease;
 }
 
-#fulltext mark.concern-mark.active-highlight {
+#fulltext mark.flag-mark.active-highlight {
   background: var(--accent-soft);
   border-bottom-style: solid;
 }
@@ -442,7 +444,7 @@ header.site-header {
 }
 
 .flag-icon:hover {
-  background: #8f3f16;
+  background: #0d1835;
 }
 
 footer.site-footer {

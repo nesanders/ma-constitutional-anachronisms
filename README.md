@@ -4,8 +4,8 @@ A single-page interactive that highlights five passages in the Massachusetts
 Constitution a modern reader might flag as anachronistic, exclusionary, or
 otherwise dated, alongside the full constitutional text for reference.
 
-**Live structure:** concern cards are the primary surface; the full text is a
-secondary, de-emphasized reference pane. Clicking a concern scrolls the text
+**Live structure:** flag cards are the primary surface; the full text is a
+secondary, de-emphasized reference pane. Clicking a flag scrolls the text
 pane to the relevant passage and highlights it; clicking a flagged passage (or
 its flag icon) in the full text opens the corresponding card.
 
@@ -14,7 +14,7 @@ its flag icon) in the full text opens the corresponding card.
 - `index.html` — page structure plus the full constitutional text as static
   HTML (Preamble, Part the First, Part the Second, and all 121 current
   Articles of Amendment), using the same section ids as the source.
-- `concerns.js` — the five concern entries (`id`, `location`, `anchorId`,
+- `flags.js` — the five flag entries (`id`, `location`, `anchorId`,
   `shortLabel`, `quote`, `context`, `status`, `stillInForce`), kept separate
   from the full text so either can be edited independently.
 - `style.css` — all styling.
@@ -30,7 +30,7 @@ The full text was fetched directly from the official record at
 [malegislature.gov/Laws/Constitution](https://malegislature.gov/Laws/Constitution)
 and reproduces its section structure, ids, and bracketed
 superseded/cross-reference notes (styled distinctly in the full-text pane
-rather than removed). The five concern citations were checked against that
+rather than removed). The five flag citations were checked against that
 same source while building this page; two corrections were made along the way
 relative to the original brief:
 

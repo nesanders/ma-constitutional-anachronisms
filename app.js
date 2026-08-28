@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const listEl = document.getElementById("concerns-list");
+  const listEl = document.getElementById("flags-list");
   const counterEl = document.getElementById("progress-counter");
   const prevBtn = document.getElementById("nav-prev");
   const nextBtn = document.getElementById("nav-next");
@@ -11,57 +11,57 @@
   let activeIndex = -1;
   let currentFilter = "all";
 
-  function isAmended(concern) {
-    return concern.stillInForce === false;
+  function isAmended(flag) {
+    return flag.stillInForce === false;
   }
 
-  function visibleConcerns() {
-    if (currentFilter === "all") return CONCERNS;
-    if (currentFilter === "in-force") return CONCERNS.filter((c) => !isAmended(c));
-    return CONCERNS.filter((c) => isAmended(c));
+  function visibleFlags() {
+    if (currentFilter === "all") return FLAGS;
+    if (currentFilter === "in-force") return FLAGS.filter((f) => !isAmended(f));
+    return FLAGS.filter((f) => isAmended(f));
   }
 
-  function allAnchorIds(concern) {
-    return [concern.anchorId].concat(concern.extraAnchorIds || []);
+  function allAnchorIds(flag) {
+    return [flag.anchorId].concat(flag.extraAnchorIds || []);
   }
 
-  function buildCard(concern, displayIndex, total) {
+  function buildCard(flag, displayIndex, total) {
     const card = document.createElement("article");
-    card.className = "concern-card";
+    card.className = "flag-card";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
-    card.dataset.concernId = concern.id;
+    card.dataset.flagId = flag.id;
     card.setAttribute(
       "aria-label",
-      "Concern " + displayIndex + " of " + total + ": " + concern.shortLabel
+      "Flag " + displayIndex + " of " + total + ": " + flag.shortLabel
     );
 
-    const amended = isAmended(concern);
+    const amended = isAmended(flag);
     card.innerHTML =
       '<div class="card-top">' +
-      '<span class="card-index">Concern ' + displayIndex + " of " + total + "</span>" +
+      '<span class="card-index">Flag ' + displayIndex + " of " + total + "</span>" +
       '<span class="status-chip ' + (amended ? "amended" : "in-force") + '">' +
       (amended ? "Partially addressed" : "Still in force") +
       "</span>" +
       "</div>" +
-      "<h3>" + escapeHtml(concern.shortLabel) + "</h3>" +
-      '<div class="location">' + escapeHtml(concern.location) + "</div>" +
-      "<blockquote>&ldquo;" + escapeHtml(concern.quote) + "&rdquo;</blockquote>" +
-      '<p class="context">' + escapeHtml(concern.context) + "</p>" +
+      "<h3>" + escapeHtml(flag.shortLabel) + "</h3>" +
+      '<div class="location">' + escapeHtml(flag.location) + "</div>" +
+      "<blockquote>&ldquo;" + escapeHtml(flag.quote) + "&rdquo;</blockquote>" +
+      '<p class="context">' + escapeHtml(flag.context) + "</p>" +
       "<p style=\"font-size:0.8rem;color:var(--ink-muted);margin:0\"><strong>Status:</strong> " +
-      escapeHtml(concern.status) +
+      escapeHtml(flag.status) +
       "</p>" +
       '<button class="view-in-text-toggle" type="button">View in full text ↓</button>' +
       '<div class="inline-clause-disclosure"></div>';
 
     card.addEventListener("click", (e) => {
       if (e.target.closest(".view-in-text-toggle")) return;
-      activateConcern(concern.id, { scrollText: true, scrollCard: false });
+      activateFlag(flag.id, { scrollText: true, scrollCard: false });
     });
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        activateConcern(concern.id, { scrollText: true, scrollCard: false });
+        activateFlag(flag.id, { scrollText: true, scrollCard: false });
       }
     });
 
@@ -72,19 +72,19 @@
       const isOpen = disclosure.classList.toggle("open");
       toggleBtn.textContent = isOpen ? "Hide full text ↑" : "View in full text ↓";
       if (isOpen && !disclosure.dataset.filled) {
-        disclosure.innerHTML = buildInlineClause(concern);
+        disclosure.innerHTML = buildInlineClause(flag);
         disclosure.dataset.filled = "1";
       }
       if (isOpen) {
-        activateConcern(concern.id, { scrollText: false, scrollCard: false });
+        activateFlag(flag.id, { scrollText: false, scrollCard: false });
       }
     });
 
     return card;
   }
 
-  function buildInlineClause(concern) {
-    const ids = allAnchorIds(concern);
+  function buildInlineClause(flag) {
+    const ids = allAnchorIds(flag);
     const pieces = [];
     ids.forEach((id) => {
       const heading = document.getElementById(id);
@@ -110,56 +110,56 @@
 
   function renderList() {
     listEl.innerHTML = "";
-    const concerns = visibleConcerns();
-    concerns.forEach((c, i) => {
-      listEl.appendChild(buildCard(c, i + 1, concerns.length));
+    const flags = visibleFlags();
+    flags.forEach((f, i) => {
+      listEl.appendChild(buildCard(f, i + 1, flags.length));
     });
     updateCounter();
   }
 
   function updateCounter() {
-    const concerns = visibleConcerns();
-    if (activeIndex < 0 || activeIndex >= concerns.length) {
-      counterEl.textContent = concerns.length ? "Concern — of " + concerns.length : "No concerns match filter";
+    const flags = visibleFlags();
+    if (activeIndex < 0 || activeIndex >= flags.length) {
+      counterEl.textContent = flags.length ? "Flag — of " + flags.length : "No flags match filter";
     } else {
-      counterEl.textContent = "Concern " + (activeIndex + 1) + " of " + concerns.length;
+      counterEl.textContent = "Flag " + (activeIndex + 1) + " of " + flags.length;
     }
-    prevBtn.disabled = concerns.length === 0 || activeIndex <= 0;
-    nextBtn.disabled = concerns.length === 0 || activeIndex >= concerns.length - 1;
+    prevBtn.disabled = flags.length === 0 || activeIndex <= 0;
+    nextBtn.disabled = flags.length === 0 || activeIndex >= flags.length - 1;
   }
 
   function clearHighlights() {
-    document.querySelectorAll("mark.concern-mark.active-highlight").forEach((m) => {
+    document.querySelectorAll("mark.flag-mark.active-highlight").forEach((m) => {
       m.classList.remove("active-highlight");
     });
-    document.querySelectorAll(".concern-card.is-active").forEach((c) => {
+    document.querySelectorAll(".flag-card.is-active").forEach((c) => {
       c.classList.remove("is-active");
     });
   }
 
-  function activateConcern(concernId, opts) {
+  function activateFlag(flagId, opts) {
     opts = opts || {};
-    const concerns = visibleConcerns();
-    const idx = concerns.findIndex((c) => c.id === concernId);
-    const concern = CONCERNS.find((c) => c.id === concernId);
-    if (!concern) return;
+    const flags = visibleFlags();
+    const idx = flags.findIndex((f) => f.id === flagId);
+    const flag = FLAGS.find((f) => f.id === flagId);
+    if (!flag) return;
 
     clearHighlights();
 
-    document.querySelectorAll('.concern-card[data-concern-id="' + concernId + '"]').forEach((c) => {
+    document.querySelectorAll('.flag-card[data-flag-id="' + flagId + '"]').forEach((c) => {
       c.classList.add("is-active");
       if (opts.scrollCard) {
         c.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
     });
 
-    document.querySelectorAll('mark.concern-mark[data-concern="' + concernId + '"]').forEach((m) => {
+    document.querySelectorAll('mark.flag-mark[data-flag="' + flagId + '"]').forEach((m) => {
       m.classList.add("active-highlight");
     });
 
     if (opts.scrollText) {
-      const firstMark = document.querySelector('mark.concern-mark[data-concern="' + concernId + '"]');
-      const target = firstMark || document.getElementById(concern.anchorId);
+      const firstMark = document.querySelector('mark.flag-mark[data-flag="' + flagId + '"]');
+      const target = firstMark || document.getElementById(flag.anchorId);
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" });
       }
@@ -172,11 +172,11 @@
   }
 
   function goto(delta) {
-    const concerns = visibleConcerns();
-    if (!concerns.length) return;
+    const flags = visibleFlags();
+    if (!flags.length) return;
     let next = activeIndex + delta;
-    next = Math.max(0, Math.min(concerns.length - 1, next));
-    activateConcern(concerns[next].id, { scrollText: true, scrollCard: true });
+    next = Math.max(0, Math.min(flags.length - 1, next));
+    activateFlag(flags[next].id, { scrollText: true, scrollCard: true });
   }
 
   prevBtn.addEventListener("click", () => goto(-1));
@@ -195,13 +195,13 @@
 
   // Bidirectional linking: flag icons next to marked passages in the full text.
   function insertFlagIcons() {
-    document.querySelectorAll("mark.concern-mark").forEach((mark) => {
-      const concernId = mark.dataset.concern;
+    document.querySelectorAll("mark.flag-mark").forEach((mark) => {
+      const flagId = mark.dataset.flag;
       const btn = document.createElement("button");
       btn.className = "flag-icon";
       btn.type = "button";
-      btn.title = "See related concern";
-      btn.setAttribute("aria-label", "See related concern card");
+      btn.title = "See related flag";
+      btn.setAttribute("aria-label", "See related flag card");
       btn.innerHTML =
         '<svg viewBox="0 0 16 16" width="9" height="9" fill="currentColor" aria-hidden="true">' +
         '<path d="M2 1a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V2a1 1 0 0 1 1-1z"/>' +
@@ -212,21 +212,21 @@
         currentFilter = "all";
         filterButtons.forEach((b) => b.classList.toggle("active", b.dataset.filter === "all"));
         renderList();
-        activateConcern(concernId, { scrollText: false, scrollCard: true });
-        const card = document.querySelector('.concern-card[data-concern-id="' + concernId + '"]');
+        activateFlag(flagId, { scrollText: false, scrollCard: true });
+        const card = document.querySelector('.flag-card[data-flag-id="' + flagId + '"]');
         if (card) card.focus();
       });
       mark.after(btn);
     });
 
-    // clicking the marked text itself also opens the card (not just the flag)
-    document.querySelectorAll("mark.concern-mark").forEach((mark) => {
+    // clicking the marked text itself also opens the card (not just the flag icon)
+    document.querySelectorAll("mark.flag-mark").forEach((mark) => {
       mark.addEventListener("click", () => {
-        const concernId = mark.dataset.concern;
+        const flagId = mark.dataset.flag;
         currentFilter = "all";
         filterButtons.forEach((b) => b.classList.toggle("active", b.dataset.filter === "all"));
         renderList();
-        activateConcern(concernId, { scrollText: false, scrollCard: true });
+        activateFlag(flagId, { scrollText: false, scrollCard: true });
       });
     });
   }
