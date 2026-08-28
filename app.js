@@ -5,29 +5,26 @@
   const counterEl = document.getElementById("progress-counter");
   const prevBtn = document.getElementById("nav-prev");
   const nextBtn = document.getElementById("nav-next");
-  const filterButtons = document.querySelectorAll(".filter-group button");
   const fulltextPane = document.getElementById("fulltext");
 
   let activeIndex = -1;
-  let currentFilter = "all";
 
   function isAmended(flag) {
     return flag.stillInForce === false;
-  }
-
-  function visibleFlags() {
-    if (currentFilter === "all") return FLAGS;
-    if (currentFilter === "in-force") return FLAGS.filter((f) => !isAmended(f));
-    return FLAGS.filter((f) => isAmended(f));
   }
 
   function allAnchorIds(flag) {
     return [flag.anchorId].concat(flag.extraAnchorIds || []);
   }
 
+  function flagHash(flagId) {
+    return "flag-" + flagId;
+  }
+
   function buildCard(flag, displayIndex, total) {
     const card = document.createElement("article");
     card.className = "flag-card";
+    card.id = flagHash(flag.id);
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.dataset.flagId = flag.id;
@@ -51,18 +48,26 @@
       "<p style=\"font-size:0.8rem;color:var(--ink-muted);margin:0\"><strong>Status:</strong> " +
       escapeHtml(flag.status) +
       "</p>" +
+      '<a class="anchor-link" href="#' + flagHash(flag.id) + '" aria-label="Direct link to this flag">Link ⚭</a>' +
       '<button class="view-in-text-toggle" type="button">View in full text ↓</button>' +
       '<div class="inline-clause-disclosure"></div>';
 
     card.addEventListener("click", (e) => {
-      if (e.target.closest(".view-in-text-toggle")) return;
-      activateFlag(flag.id, { scrollText: true, scrollCard: false });
+      if (e.target.closest(".view-in-text-toggle") || e.target.closest(".anchor-link")) return;
+      activateFlag(flag.id, { scrollText: true, scrollCard: false, updateHash: true });
     });
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
+        if (e.target.closest(".anchor-link")) return;
         e.preventDefault();
-        activateFlag(flag.id, { scrollText: true, scrollCard: false });
+        activateFlag(flag.id, { scrollText: true, scrollCard: false, updateHash: true });
       }
+    });
+
+    const anchorLink = card.querySelector(".anchor-link");
+    anchorLink.addEventListener("click", (e) => {
+      e.stopPropagation();
+      activateFlag(flag.id, { scrollText: true, scrollCard: false, updateHash: true });
     });
 
     const toggleBtn = card.querySelector(".view-in-text-toggle");
@@ -76,7 +81,7 @@
         disclosure.dataset.filled = "1";
       }
       if (isOpen) {
-        activateFlag(flag.id, { scrollText: false, scrollCard: false });
+        activateFlag(flag.id, { scrollText: false, scrollCard: false, updateHash: true });
       }
     });
 
@@ -110,22 +115,20 @@
 
   function renderList() {
     listEl.innerHTML = "";
-    const flags = visibleFlags();
-    flags.forEach((f, i) => {
-      listEl.appendChild(buildCard(f, i + 1, flags.length));
+    FLAGS.forEach((f, i) => {
+      listEl.appendChild(buildCard(f, i + 1, FLAGS.length));
     });
     updateCounter();
   }
 
   function updateCounter() {
-    const flags = visibleFlags();
-    if (activeIndex < 0 || activeIndex >= flags.length) {
-      counterEl.textContent = flags.length ? "Flag — of " + flags.length : "No flags match filter";
+    if (activeIndex < 0 || activeIndex >= FLAGS.length) {
+      counterEl.textContent = "Flag — of " + FLAGS.length;
     } else {
-      counterEl.textContent = "Flag " + (activeIndex + 1) + " of " + flags.length;
+      counterEl.textContent = "Flag " + (activeIndex + 1) + " of " + FLAGS.length;
     }
-    prevBtn.disabled = flags.length === 0 || activeIndex <= 0;
-    nextBtn.disabled = flags.length === 0 || activeIndex >= flags.length - 1;
+    prevBtn.disabled = activeIndex <= 0;
+    nextBtn.disabled = activeIndex >= FLAGS.length - 1;
   }
 
   function clearHighlights() {
@@ -139,9 +142,8 @@
 
   function activateFlag(flagId, opts) {
     opts = opts || {};
-    const flags = visibleFlags();
-    const idx = flags.findIndex((f) => f.id === flagId);
-    const flag = FLAGS.find((f) => f.id === flagId);
+    const idx = FLAGS.findIndex((f) => f.id === flagId);
+    const flag = FLAGS[idx];
     if (!flag) return;
 
     clearHighlights();
@@ -165,33 +167,23 @@
       }
     }
 
-    if (idx >= 0) {
-      activeIndex = idx;
+    if (opts.updateHash && "history" in window) {
+      history.replaceState(null, "", "#" + flagHash(flagId));
     }
+
+    activeIndex = idx;
     updateCounter();
   }
 
   function goto(delta) {
-    const flags = visibleFlags();
-    if (!flags.length) return;
+    if (!FLAGS.length) return;
     let next = activeIndex + delta;
-    next = Math.max(0, Math.min(flags.length - 1, next));
-    activateFlag(flags[next].id, { scrollText: true, scrollCard: true });
+    next = Math.max(0, Math.min(FLAGS.length - 1, next));
+    activateFlag(FLAGS[next].id, { scrollText: true, scrollCard: true, updateHash: true });
   }
 
   prevBtn.addEventListener("click", () => goto(-1));
   nextBtn.addEventListener("click", () => goto(1));
-
-  filterButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      filterButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentFilter = btn.dataset.filter;
-      activeIndex = -1;
-      clearHighlights();
-      renderList();
-    });
-  });
 
   // Bidirectional linking: flag icons next to marked passages in the full text.
   function insertFlagIcons() {
@@ -209,10 +201,7 @@
         "</svg>";
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        currentFilter = "all";
-        filterButtons.forEach((b) => b.classList.toggle("active", b.dataset.filter === "all"));
-        renderList();
-        activateFlag(flagId, { scrollText: false, scrollCard: true });
+        activateFlag(flagId, { scrollText: false, scrollCard: true, updateHash: true });
         const card = document.querySelector('.flag-card[data-flag-id="' + flagId + '"]');
         if (card) card.focus();
       });
@@ -223,14 +212,26 @@
     document.querySelectorAll("mark.flag-mark").forEach((mark) => {
       mark.addEventListener("click", () => {
         const flagId = mark.dataset.flag;
-        currentFilter = "all";
-        filterButtons.forEach((b) => b.classList.toggle("active", b.dataset.filter === "all"));
-        renderList();
-        activateFlag(flagId, { scrollText: false, scrollCard: true });
+        activateFlag(flagId, { scrollText: false, scrollCard: true, updateHash: true });
       });
     });
   }
 
+  // Deep-linking: activate the flag named in the URL hash (#flag-c1), on load
+  // and whenever the hash changes (back/forward, or a pasted link).
+  function activateFromHash(opts) {
+    const hash = window.location.hash.replace(/^#/, "");
+    const match = hash.match(/^flag-(.+)$/);
+    if (!match) return false;
+    const flag = FLAGS.find((f) => f.id === match[1]);
+    if (!flag) return false;
+    activateFlag(flag.id, Object.assign({ scrollText: true, scrollCard: true }, opts));
+    return true;
+  }
+
+  window.addEventListener("hashchange", () => activateFromHash({ updateHash: false }));
+
   renderList();
   insertFlagIcons();
+  activateFromHash({ updateHash: false });
 })();
